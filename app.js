@@ -4,11 +4,18 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 const index = require('./routes/index');
 const api = require('./routes/api/index');
 
 const app = express();
+
+// Connect Mongoose
+mongoose.connect('mongodb://192.168.1.9/musiclist', {
+  useMongoClient: true,
+  /* other options */
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
