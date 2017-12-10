@@ -11,7 +11,7 @@ router.get('/list', (req, res, next) => {
   User.find((err, users) => {
     if (err) {
       // if something's broken, send an error
-      res.send(err);
+      return res.send(err);
     }
     // Otherwise, send the array of users
     return res.json(users);
