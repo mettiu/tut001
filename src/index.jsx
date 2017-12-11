@@ -3,6 +3,6 @@ import { render } from 'react-dom';
 import TestComponent from './testcomponent';
 
 render(
-  <TestComponent />,
+  <TestComponent headline="Test Headline" count={1234} showCount />,
   document.querySelector('#react-app'),
 );
