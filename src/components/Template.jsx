@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Header from './shared/Header';
 import HomePageCont from './home/HomePageContainer';
 import ProfilePage from './account/ProfilePage';
-import LoginPage from './account/LoginPage';
+import LoginPage from './account/LoginPageContainer';
 
 export default function Template(props) {
   return (
