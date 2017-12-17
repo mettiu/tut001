@@ -3,22 +3,38 @@ import { Link } from 'react-router-dom';
 import { Collapse, Navbar, NavbarToggler, NavbarBrand, Nav, NavItem, NavLink } from 'reactstrap';
 
 const renderLogin = () => <NavLink tag={Link} to="/account/login">Log In</NavLink>;
-const renderGreeting = name => <span>Welcome, {name}</span>;
 
 export default class Header extends React.Component {
   constructor(props) {
     super(props);
 
+    this.logOutClick = this.logOutClick.bind(this);
+    this.renderGreeting = this.renderGreeting.bind(this);
     this.toggleNavbar = this.toggleNavbar.bind(this);
     this.state = {
       isOpen: false,
     };
   }
 
+
   toggleNavbar() {
     this.setState({
       isOpen: !this.state.isOpen,
     });
+  }
+
+  logOutClick(e) {
+    e.preventDefault();
+    const { logUserOut } = this.props;
+    logUserOut();
+  }
+
+  renderGreeting(name) {
+    return (
+      <span>
+        Welcome, {name} | <a href="/logout" onClick={this.logOutClick}>Log Out</a>
+      </span>
+    );
   }
 
   render() {
@@ -31,7 +47,7 @@ export default class Header extends React.Component {
           <Collapse isOpen={this.state.isOpen} navbar>
             <Nav className="ml-auto" navbar>
               <NavItem>
-                { isLoggedIn ? renderGreeting(firstName) : renderLogin() }
+                { isLoggedIn ? this.renderGreeting(firstName) : renderLogin() }
               </NavItem>
             </Nav>
           </Collapse>
