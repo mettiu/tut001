@@ -16,17 +16,16 @@ export default class Header extends React.Component {
     };
   }
 
+  logOutClick(e) {
+    e.preventDefault();
+    const { logUserOutFunction } = this.props;
+    logUserOutFunction();
+  }
 
   toggleNavbar() {
     this.setState({
       isOpen: !this.state.isOpen,
     });
-  }
-
-  logOutClick(e) {
-    e.preventDefault();
-    const { logUserOut } = this.props;
-    logUserOut();
   }
 
   renderGreeting(name) {
