@@ -5,6 +5,7 @@ import HomePageCont from './home/HomePageContainer';
 import ProfilePage from './account/ProfilePage';
 import LoginPage from './account/LoginPageContainer';
 import RegisterPage from './account/RegisterPageContainer';
+import RegistrationSuccessPage from './account/RegistrationSuccessPageContainer';
 
 export default function Template(props) {
   const { authentication, progress } = props;
@@ -17,6 +18,7 @@ export default function Template(props) {
           <Route path="/account/profile/:id" component={ProfilePage} />
           <Route exact path="/account/login" component={LoginPage} />
           <Route exact path="/account/register" component={RegisterPage} />
+          <Route exact path="/account/registration-success" component={RegistrationSuccessPage} />
         </section>
         <div className="loader-wrapper" style={progress > 0 ? { display: 'block' } : { display: 'none' }}>
           <div className="loader-box">
