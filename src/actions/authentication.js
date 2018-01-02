@@ -1,6 +1,6 @@
 import 'whatwg-fetch';
-import { clearError } from './error';
 import { decrementProgress, incrementProgress } from './progress';
+import { clearError } from './error';
 
 // Action Creators
 export const loginAttempt = () => ({ type: 'AUTHENTICATION_LOGIN_ATTEMPT' });
@@ -11,10 +11,12 @@ export const logoutSuccess = () => ({ type: 'AUTHENTICATION_LOGOUT_SUCCESS' });
 export const registrationFailure = error => ({ type: 'AUTHENTICATION_REGISTRATION_FAILURE', error });
 export const registrationSuccess = () => ({ type: 'AUTHENTICATION_REGISTRATION_SUCCESS' });
 export const registrationSuccessViewed = () => ({ type: 'AUTHENTICATION_REGISTRATION_SUCCESS_VIEWED' });
+export const passwordResetHashCreated = () => ({ type: 'AUTHENTICATION_PASSWORD_RESET_HASH_CREATED' });
+export const passwordResetHashFailure = () => ({ type: 'AUTHENTICATION_PASSWORD_RESET_HASH_FAILURE' });
 export const sessionCheckFailure = () => ({ type: 'AUTHENTICATION_SESSION_CHECK_FAILURE' });
 export const sessionCheckSuccess = json => ({ type: 'AUTHENTICATION_SESSION_CHECK_SUCCESS', json });
 
-// Check User session
+// Check User Session
 export function checkSession() {
   return async (dispatch) => {
     // contact the API
@@ -42,6 +44,40 @@ export function checkSession() {
       .catch(error => dispatch(sessionCheckFailure(error)));
   };
 }
+
+// Send email to API for hashing
+export function createHash(email) {
+  return async (dispatch) => {
+    // contact the API
+    await fetch(
+      // where to contact
+      '/api/authentication/saveresethash',
+      // what to send
+      {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin',
+      },
+    )
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        }
+        return null;
+      })
+      .then((json) => {
+        if (json.username) {
+          return dispatch(passwordResetHashCreated(json));
+        }
+        return dispatch(passwordResetHashFailure(new Error('Something went wrong. Please try again.')));
+      })
+      .catch(error => dispatch(passwordResetHashFailure(error)));
+  };
+}
+
 
 // Log User In
 export function logUserIn(userData) {
@@ -79,7 +115,7 @@ export function logUserIn(userData) {
         if (json) {
           dispatch(loginSuccess(json));
         } else {
-          dispatch(loginFailure(new Error('Email or Password incorrect. please try again.')));
+          dispatch(loginFailure(new Error('Email or Password Incorrect. Please Try again.')));
         }
       })
       .catch((error) => {
@@ -160,11 +196,11 @@ export function registerUser(userData) {
           await dispatch(loginSuccess(json));
           await dispatch(registrationSuccess());
         } else {
-          dispatch(registrationFailure(new Error(json.error.message ? 'Email or username aready exists' : json.error)));
+          dispatch(registrationFailure(new Error(json.error.message ? 'Email or username already exists' : json.error)));
         }
       })
       .catch((error) => {
-        dispatch(registrationFailure(new Error(error.message || 'Registration failed. please try again.')));
+        dispatch(registrationFailure(new Error(error.message || 'Registration Failed. Please try again.')));
       });
 
     // turn off spinner
