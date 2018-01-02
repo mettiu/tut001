@@ -4,6 +4,7 @@ import HeaderContainer from './shared/HeaderContainer';
 import HomePageCont from './home/HomePageContainer';
 import ProfilePage from './account/ProfilePage';
 import LoginPage from './account/LoginPageContainer';
+import RegisterPage from './account/RegisterPageContainer';
 
 export default function Template(props) {
   const { authentication, progress } = props;
@@ -15,6 +16,7 @@ export default function Template(props) {
           <Route exact path="/" component={HomePageCont} />
           <Route path="/account/profile/:id" component={ProfilePage} />
           <Route exact path="/account/login" component={LoginPage} />
+          <Route exact path="/account/register" component={RegisterPage} />
         </section>
         <div className="loader-wrapper" style={progress > 0 ? { display: 'block' } : { display: 'none' }}>
           <div className="loader-box">
