@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createHash } from '../../actions/authentication';
+import { createHash, passwordResetClear } from '../../actions/authentication';
 
 import ResetPasswordPage from './ResetPasswordPage';
 
@@ -9,6 +9,12 @@ export class ResetPasswordPageContainer extends React.Component {
     super(props);
     // bound functions
     this.resetPasswordRequest = this.resetPasswordRequest.bind(this);
+    this.clearPasswordResetFunction = this.clearPasswordResetFunction.bind(this);
+  }
+
+  clearPasswordResetFunction() {
+    const { dispatch } = this.props;
+    dispatch(passwordResetClear());
   }
 
   resetPasswordRequest(email) {
@@ -17,10 +23,18 @@ export class ResetPasswordPageContainer extends React.Component {
   }
 
   render() {
+    const { isPasswordReset } = this.props.authentication;
+
     return (
-      <ResetPasswordPage resetPasswordFunction={this.resetPasswordRequest} />
+      <ResetPasswordPage
+        clearPasswordResetFunction={this.clearPasswordResetFunction}
+        isPasswordReset={isPasswordReset}
+        resetPasswordFunction={this.resetPasswordRequest}
+      />
     );
   }
 }
 
-export default connect()(ResetPasswordPageContainer);
+const mapStateToProps = state => ({ authentication: state.authentication });
+
+export default connect(mapStateToProps)(ResetPasswordPageContainer);
