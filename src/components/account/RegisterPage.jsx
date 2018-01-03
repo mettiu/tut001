@@ -30,7 +30,7 @@ export default class ProfilePage extends React.Component {
   handleKeyPress(target) {
     if (target.charCode === 13) {
       target.preventDefault();
-      this.compileFormData();
+      this.handleValidSubmit();
     }
   }
 
