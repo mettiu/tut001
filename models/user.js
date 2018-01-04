@@ -1,19 +1,17 @@
 const mongoose = require('mongoose');
 
-// const Schema = mongoose.Schema;
-// const { Schema: Schema } = mongoose;
-const { Schema } = mongoose;
-
+const Schema = mongoose.Schema;
 const passportLocalMongoose = require('passport-local-mongoose');
 
 const User = new Schema({
-  username: String,
+  albums: [Schema.Types.Mixed],
+  artists: [Schema.Types.Mixed],
   email: String,
-  // password: { type: String, select: false },
-  passwordReset: { type: String, select: false },
   firstName: String,
   lastName: String,
-});
+  passwordReset: { type: String, select: false },
+  username: String,
+}, { usePushEach: true });
 
 User.plugin(passportLocalMongoose);
 
