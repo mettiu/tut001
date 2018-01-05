@@ -13,7 +13,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import './css/musiclist.scss';
 
 // Default export from a local file
-import DevTools from './components/shared/DevTools';
+// import DevTools from './components/shared/DevTools';
 import configureStore from './store';
 
 // JSX Modules
@@ -27,7 +27,7 @@ const renderApp = (Component) => {
       <Provider store={Store}>
         <div>
           <Component />
-          <DevTools />
+          { /* <DevTools /> */ }
         </div>
       </Provider>
     </AppContainer>,
