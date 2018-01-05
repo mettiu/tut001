@@ -4,17 +4,15 @@ const bodyParser = require('body-parser');
 const compression = require('compression');
 const cookieParser = require('cookie-parser');
 const express = require('express');
-const expressSession = require('express-session')({
-  secret: appConfig.expressSession.secret,
-  resave: false,
-  saveUninitialized: false,
-});
-// const favicon = require('serve-favicon');
+const expressSession = require('express-session');
+const favicon = require('serve-favicon');
+const helmet = require('helmet');
 const LocalStrategy = require('passport-local').Strategy;
 const logger = require('morgan');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const path = require('path');
+const RateLimit = require('express-rate-limit');
 const webpack = require('webpack');
 const webpackConfig = require('./webpack.config');
 const webpackDevMiddleware = require('webpack-dev-middleware');
@@ -44,12 +42,27 @@ app.set('view engine', 'ejs');
 
 // uncomment after placing your favicon in /public
 // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(compression());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(compression());
 app.use(cookieParser());
-app.use(expressSession);
+app.use(helmet());
+
+// Express Session
+const sessionValues = {
+  cookie: {},
+  name: 'sessionId',
+  resave: false,
+  saveUninitialized: true,
+  secret: appConfig.expressSession.secret,
+};
+if (app.get('env') === 'production') {
+  app.set('trust proxy', 1);
+  sessionValues.cookie.secure = true;
+}
+app.use(expressSession(sessionValues));
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -70,9 +83,17 @@ if (process.env.NODE_ENV !== 'production') {
   }));
 }
 
+// configure rate limiter
+const apiLimiter = new RateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 50,
+  delayMs: 0, // disabled
+});
+app.use('/api/', apiLimiter);
+
 app.use('/api', api);
-app.use('/api/artists', artists);
 app.use('/api/albums', albums);
+app.use('/api/artists', artists);
 app.use('/api/authentication', authentication);
 app.use('/api/users', users);
 app.use('/*', index);

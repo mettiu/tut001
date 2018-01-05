@@ -1,10 +1,12 @@
 const appConfig = require('../../config.js');
 const crypto = require('crypto');
+const createDOMPurify = require('dompurify');
+const express = require('express');
+const { JSDOM } = require('jsdom');
 const mailgun = require('mailgun-js')({
   apiKey: appConfig.mailgun.apiKey,
   domain: appConfig.mailgun.domain,
 });
-const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const User = require('../../models/user.js');
@@ -57,13 +59,24 @@ router.post('/register', async (req, res) => {
   if (foundUser) { return res.send(JSON.stringify({ error: 'Email or username already exists' })); }
   // Create a user object to save, using values from incoming JSON
   if (!foundUser) {
-    const newUser = new User(req.body);
+    // sanitize data
+    const window = (new JSDOM('')).window;
+    const DOMPurify = createDOMPurify(window);
+    const sanitizedBody = {
+      username: DOMPurify.sanitize(req.body.username),
+      email: DOMPurify.sanitize(req.body.email),
+      firstName: DOMPurify.sanitize(req.body.firstName),
+      lastName: DOMPurify.sanitize(req.body.lastName),
+      password: req.body.password,
+    };
+
+    const newUser = new User(sanitizedBody);
 
     // Save, via Passport's "register" method, the user
     return User.register(newUser, req.body.password, (err) => {
       // If there's a problem, send back a JSON object with the error
       if (err) {
-        return res.send(JSON.stringify({ error: err }));
+        return res.send(JSON.stringify({ error: err.message }));
       }
       // Otherwise log them in
       return passport.authenticate('local')(req, res, () => {
@@ -127,7 +140,7 @@ router.post('/saveresethash', async (req, res) => {
     // If the user exists, save their password hash
     const timeInMs = Date.now();
     const hashString = `${req.body.email}${timeInMs}`;
-    const { secret } = appConfig.crypto;
+    const secret = appConfig.crypto.secret;
     const hash = crypto.createHmac('sha256', secret)
                        .update(hashString)
                        .digest('hex');
@@ -138,7 +151,7 @@ router.post('/saveresethash', async (req, res) => {
 
       // Put together the email
       const emailData = {
-        from: `no-reply <no-reply@${appConfig.mailgun.domain}>`,
+        from: `CloseBrace <postmaster@${appConfig.mailgun.domain}>`,
         to: foundUser.email,
         subject: 'Reset Your Password',
         text: `A password reset has been requested for the MusicList account connected to this email address. If you made this request, please click the following link: https://musiclist.com/account/change-password/${foundUser.passwordReset} ... if you didn't make this request, feel free to ignore it!`,
@@ -148,7 +161,7 @@ router.post('/saveresethash', async (req, res) => {
       // Send it
       mailgun.messages().send(emailData, (error, body) => {
         if (error || !body) {
-          result = res.send(JSON.stringify({ error: 'zzzzzSomething went wrong while attempting to send the email. Please try again.' }));
+          result = res.send(JSON.stringify({ error: 'Something went wrong while attempting to send the email. Please try again.' }));
         } else {
           result = res.send(JSON.stringify({ success: true }));
         }
