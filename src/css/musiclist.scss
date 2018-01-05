@@ -2,12 +2,12 @@ header {
   margin-bottom: 1rem;
 }
 
-.form-control::-webkit-input-placeholder { color: #EEE; }
-.form-control::-moz-placeholder { color: #EEE; }
-.form-control:-ms-input-placeholder { color: #EEE; }
-.form-control:-moz-placeholder { color: #EEE; }
+.form-control::-webkit-input-placeholder { color: #EEE }
+.form-control::-moz-placeholder { color: #EEE }
+.form-control:-ms-input-placeholder { color: #EEE }
+.form-control:-moz-placeholder { color: #EEE }
 
-// Spinner /
+/* Spinner */
 .loader-wrapper {
   overflow: hidden;
   position: fixed;
@@ -67,5 +67,27 @@ header {
         transform: rotate(360deg);
       }
     }
-  } // loader-box /
-} // loader-wrapper /
+  } /* loader-box */
+} /* loader-wrapper */
+
+/* Flexbox tables */
+table.flex {
+  tr {
+    display: flex;
+
+    th, td {
+      flex-basis: 25%;
+
+      &.thumb {
+        flex-basis: auto;
+        width: 100px;
+        text-align: center;
+        padding: 10px;
+
+        img {
+          width: 80px;
+        }
+      }
+    }
+  }
+}
